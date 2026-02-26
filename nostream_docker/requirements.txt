@@ -1,0 +1,9 @@
+fastapi==0.115.12
+uvicorn[standard]==0.24.0
+pydantic==2.11.4
+openai==1.83.0
+transformers==4.52.1
+beautifulsoup4==4.13.4
+cachetools==5.3.1
+numpy==2.2.3
+requests==2.32.3

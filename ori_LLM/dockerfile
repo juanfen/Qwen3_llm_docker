@@ -1,0 +1,56 @@
+# 使用 CUDA 基础镜像
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
+
+# 设置环境变量
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=Asia/Shanghai \
+    PYTHONUNBUFFERED=1
+
+# 安装 Python 和基础依赖
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建软链接
+RUN ln -s /usr/bin/python3.11 /usr/bin/python
+
+RUN pip install --no-cache-dir torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu124
+
+# 安装 vLLM 和依赖
+RUN pip install --no-cache-dir \
+    vllm==0.4.0 \
+    transformers==4.52.1 \
+    accelerate==0.25.0 \
+    ray==2.9.0
+
+# 创建模型目录
+RUN mkdir -p /models
+
+# 设置工作目录
+WORKDIR /app
+
+# 创建启动脚本
+RUN echo '#!/bin/bash\n\
+python -m vllm.entrypoints.openai.api_server \
+    --model ${MODEL_PATH:-/models/Qwen3} \
+    --tokenizer ${TOKENIZER_PATH:-/models/Qwen3} \
+    --dtype ${DTYPE:-float16} \
+    --served-model-name ${SERVED_MODEL_NAME:-Qwen3} \
+    --host ${HOST:-0.0.0.0} \
+    --port ${PORT:-8194} \
+    ${ENABLE_AUTO_TOOL_CHOICE:+--enable-auto-tool-choice} \
+    ${TOOL_CALL_PARSER:+--tool-call-parser $TOOL_CALL_PARSER} \
+    ${ADDITIONAL_ARGS}' > /app/start.sh && chmod +x /app/start.sh
+
+# 暴露端口
+EXPOSE 8194
+
+# 设置健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8194}/health || exit 1
+
+# 启动命令
+CMD ["/app/start.sh"]

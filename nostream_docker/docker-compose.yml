@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # 实例1 - 端口8181，4个worker
+  chatbot-8181:
+    image: mem-nostream-llm:latest
+    container_name: mem-nostream-llm-8181
+    ports:
+      - "8181:8178"  # 宿主机8181 -> 容器8178
+    environment:
+      - INSTANCE_ID=1
+      - INSTANCE_PORT=8181
+      - WORKERS=4           # 每个实例内部4个worker进程
+      - CUDA_VISIBLE_DEVICES=0
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # 实例2 - 端口8178，也可以配置不同的worker数量
+  chatbot-8178:
+    image: mem-nostream-llm:latest
+    container_name: mem-nostream-llm-8178
+    ports:
+      - "8178:8178"
+    environment:
+      - INSTANCE_ID=2
+      - INSTANCE_PORT=8178
+      - WORKERS=4           # 同样4个worker
+      - CUDA_VISIBLE_DEVICES=0
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # 实例3 - 端口8179
+  chatbot-8179:
+    image: mem-nostream-llm:latest
+    container_name: mem-nostream-llm-8179
+    ports:
+      - "8179:8178"
+    environment:
+      - INSTANCE_ID=3
+      - INSTANCE_PORT=8179
+      - WORKERS=4
+      - CUDA_VISIBLE_DEVICES=1
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # 实例4 - 端口8180
+  chatbot-8180:
+    image: mem-nostream-llm:latest
+    container_name: mem-nostream-llm-8180
+    ports:
+      - "8180:8178"
+    environment:
+      - INSTANCE_ID=4
+      - INSTANCE_PORT=8180
+      - WORKERS=4
+      - CUDA_VISIBLE_DEVICES=1
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+networks:
+  chatbot-network:
+    driver: bridge

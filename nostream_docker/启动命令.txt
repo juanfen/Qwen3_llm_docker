@@ -1,0 +1,49 @@
+docker-compose -f docker-compose.yml up -d
+
+# 4. 查看运行状态
+docker-compose -f docker-compose.yml ps
+
+# 5. 查看日志
+docker-compose -f docker-compose.yml logs -f
+
+
+# 启动所有实例
+docker-compose -f docker-compose.yml start
+
+# 停止所有实例（容器还在，只是暂停）
+docker-compose -f docker-compose.yml stop
+
+# 重启所有实例
+docker-compose -f docker-compose.yml restart
+
+# 查看所有实例状态
+docker-compose -f docker-compose.yml ps
+
+
+# 停止并删除容器（但保留卷和网络）
+docker-compose -f docker-compose.yml down
+
+# 停止并删除容器、网络、卷（彻底清理）
+docker-compose -f docker-compose.yml down -v
+
+# 停止并删除容器、网络、卷、镜像（最彻底）
+docker-compose -f docker-compose.yml down --rmi all -v
+
+# 只删除容器（保留其他）
+docker-compose -f docker-compose.yml rm
+
+
+# 启动特定实例
+docker-compose -f docker-compose.yml start chatbot-8177
+
+# 停止特定实例
+docker-compose -f docker-compose.yml stop chatbot-8177
+
+# 重启特定实例
+docker-compose -f docker-compose.yml restart chatbot-8177
+
+# 删除特定实例
+docker-compose -f docker-compose.yml rm -f chatbot-8177
+
+# 查看特定实例日志
+docker-compose -f docker-compose.yml logs -f chatbot-8177

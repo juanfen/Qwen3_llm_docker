@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  chatbot-8183:
+    image: memory_new_llm:latest
+    container_name: memory_new_llm-8183
+    ports:
+      - "8183:8178"  # 宿主机8183 -> 容器8178
+    environment:
+      - INSTANCE_ID=1
+      - INSTANCE_PORT=8183
+      - WORKERS=4           # 每个实例内部4个worker进程
+      - CUDA_VISIBLE_DEVICES=0
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # 实例2 - 端口8184，也可以配置不同的worker数量
+  chatbot-8184:
+    image: memory_new_llm:latest
+    container_name: memory_new_llm-8184
+    ports:
+      - "8184:8178"
+    environment:
+      - INSTANCE_ID=2
+      - INSTANCE_PORT=8184
+      - WORKERS=4           # 同样4个worker
+      - CUDA_VISIBLE_DEVICES=0
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # 实例3 - 端口8185
+  chatbot-8185:
+    image: memory_new_llm:latest
+    container_name: memory_new_llm-8185
+    ports:
+      - "8185:8178"
+    environment:
+      - INSTANCE_ID=3
+      - INSTANCE_PORT=8185
+      - WORKERS=4
+      - CUDA_VISIBLE_DEVICES=1
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  # 实例4 - 端口8186
+  chatbot-8186:
+    image: memory_new_llm:latest
+    container_name: memory_new_llm-8186
+    ports:
+      - "8186:8178"
+    environment:
+      - INSTANCE_ID=4
+      - INSTANCE_PORT=8186
+      - WORKERS=4
+      - CUDA_VISIBLE_DEVICES=1
+      - OPENAI_BASE_URL=http://192.168.99.105:8194/v1
+    volumes:
+      - /mnt/Data/jungao/Qwen3:/mnt/Data/jungao/Qwen3:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "192.168.99.105:192.168.99.105"
+    restart: unless-stopped
+    networks:
+      - chatbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+networks:
+  chatbot-network:
+    driver: bridge
